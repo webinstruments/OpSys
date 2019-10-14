@@ -6,26 +6,6 @@
 #include <byteswap.h>
 #include "fileHeader.h"
 
-int setField(int fd, uint32_t* field) {
-    int result = read(fd, field, sizeof(uint32_t));
-    if(result == -1) {
-        perror("main");
-    }
-    return result;
-}
-
-FileHeader getHeaderInformation(int fd) {
-    FileHeader result;
-    setField(fd, &result.type);
-    setField(fd, &result.offset);
-    setField(fd, &result.length);
-    setField(fd, &result.encoding);
-    setField(fd, &result.samplingRate);
-    setField(fd, &result.audioChannels);
-
-    return result;
-}
-
 uint8_t* readFileBackwards(uint32_t size, int sourceFd) {
     uint8_t* buffer = malloc(size * sizeof(uint8_t));
     uint8_t sample;
@@ -61,7 +41,7 @@ int main() {
     }
 
     printf("Reading file backwards...\n");
-    int32_t* buffer = readFileBackwards(headerLength, fdInput);
+    uint8_t * buffer = readFileBackwards(headerLength, fdInput);
     if (buffer == NULL) {
         printf("Something went wrong");
         return 0;
@@ -73,6 +53,8 @@ int main() {
         perror("main");
         return 0;
     }
+
+    free(buffer);
 
     return 0;
 }

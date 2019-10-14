@@ -16,4 +16,6 @@ typedef struct FileHeader {
     uint32_t audioChannels;
 } FileHeader;
 
+FileHeader getHeaderInformation(int);
+
 #endif //READMUSIC_FILEHEADER_H
