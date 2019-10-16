@@ -6,6 +6,11 @@
 #include <byteswap.h>
 #include "fileHeader.h"
 
+int printError() {
+    perror("main");
+    return 0;
+}
+
 uint8_t* readFileBackwards(uint32_t size, int sourceFd) {
     uint8_t* buffer = malloc(size * sizeof(uint8_t));
     uint8_t sample;
@@ -20,9 +25,22 @@ uint8_t* readFileBackwards(uint32_t size, int sourceFd) {
     return buffer;
 }
 
+int fileInput() {
+    int result = -1;
+    char str[100];
+    do {
+        printf("Please enter input path...\n");
+        scanf("%s", str);
+        printf("%s\n", str);
+        result = open(str, O_RDONLY);
+        perror("main");
+    } while (result == -1);
+    return result;
+}
+
 int main() {
+    int fdInput = fileInput();
     printf("Reading file...\n");
-    int fdInput = open("input.au", O_RDONLY);
     int fdOutput = open("output.au", O_WRONLY|O_TRUNC|O_CREAT|O_APPEND, 0666);
 
     FileHeader header = getHeaderInformation(fdInput);
@@ -36,22 +54,19 @@ int main() {
     uint32_t arr[] = { header.type, header.offset, header.length, header.encoding, header.samplingRate, header.audioChannels };
     int fdResult = write(fdOutput, arr, sizeof(uint32_t) * 6);
     if (fdResult == -1) {
-        perror("main");
-        return 0;
+        printError();
     }
 
     printf("Reading file backwards...\n");
     uint8_t * buffer = readFileBackwards(headerLength, fdInput);
     if (buffer == NULL) {
-        printf("Something went wrong");
-        return 0;
+        printError();
     }
 
-    printf("Write result\n");
+    printf("Writing result...\n");
     fdResult = write(fdOutput, buffer, sizeof(uint8_t) * headerLength);
     if (fdResult == -1) {
-        perror("main");
-        return 0;
+        return printError();
     }
 
     free(buffer);
