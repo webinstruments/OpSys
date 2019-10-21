@@ -6,7 +6,7 @@
 #include <byteswap.h>
 #include "fileHeader.h"
 
-int printError() {
+int printError() { // test
     perror("main");
     return 0;
 }
